@@ -104,7 +104,7 @@ def train_model(epoch: int, model,
 
         # get the final loss.
         final_loss = sum(loss_list)/len(loss_list)
-        logger.info(msg=f'Completed training epoch: {epoch} with loss: {final_loss}')
+        logger.info(msg=f'Completed training really epoch: {epoch} with loss: {final_loss}')
     except Exception as err:
         logger.error(msg=f'Encountered error {err} while training epoch {epoch}')
 
@@ -147,7 +147,7 @@ def validate_model(epoch: int, model,
                     labels.extend(label.detach().numpy())
                     predictions.extend(preds.detach().numpy())
                 else:
-                    label.extend(label.cpu().detach().numpy())
+                    labels.extend(label.cpu().detach().numpy())
                     predictions.extend(preds.cpu().detach().numpy())
 
                 # update loss list
@@ -160,11 +160,11 @@ def validate_model(epoch: int, model,
     except Exception as err:
         logger.error(msg= f"Encountered error {err} while testing epoch {epoch}")
 
-    return label, predictions, final_loss
+    return labels, predictions, final_loss
 
 
 def compute_metrics(label:List[float], predictions: List[float],
-                    final_loss:float, epoch: int) -> Optional[Dict]:
+                    final_loss:float, epoch: int,suffix:Literal['train','test']) -> Optional[Dict]:
     """_Helper function for computing metrics. It takes labels and 
     predictions and returns key outputs._
 
@@ -183,11 +183,11 @@ def compute_metrics(label:List[float], predictions: List[float],
     recall = recall_score(y_true=label, y_pred=predictions,average="weighted")
 
     return {
-        'f1_score': f1,
-        'precision_score': precision,
-        'recall_score': recall,
-        'loss': final_loss,
-        'epoch': epoch +  1
+        f'{suffix}_f1_score': f1,
+        f'{suffix}_precision_score': precision,
+        f'{suffix}_recall_score': recall,
+        f'{suffix}_loss': final_loss,
+        f'epoch': epoch +  1
     }
 
 

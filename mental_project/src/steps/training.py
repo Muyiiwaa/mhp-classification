@@ -19,7 +19,7 @@ def model_training(epochs: int, train_loader:DataLoader, test_loader:DataLoader)
     try:
         logger.info('Starting model training!')
         run = wandb.init(
-            project = "MHP-Text-Classification",
+            project = "MHP-Text-Classification-project",
             config = {
                 "learning rate": LEARNING_RATE,
                 "architecture": MODEL_URI,
@@ -33,10 +33,10 @@ def model_training(epochs: int, train_loader:DataLoader, test_loader:DataLoader)
         for epoch in range(epochs):
             train_labels, train_preds, train_loss = train_model(epoch=epoch, model=model,
                                                                 data=train_loader,device=device)
-            train_metrics = compute_metrics(train_labels, train_preds, train_loss, epoch=epoch)
+            train_metrics = compute_metrics(train_labels, train_preds, train_loss, epoch=epoch,suffix="train")
             test_labels, test_preds, test_loss = validate_model(epoch=epoch, model=model,
                                                                 data=test_loader,device=device)
-            test_metrics = compute_metrics(test_labels, test_preds, test_loss, epoch=epoch)
+            test_metrics = compute_metrics(test_labels, test_preds, test_loss, epoch=epoch,suffix="test")
 
             # combine train and test metrics
             train_metrics.update(test_metrics)
@@ -48,6 +48,7 @@ def model_training(epochs: int, train_loader:DataLoader, test_loader:DataLoader)
 
     except Exception as err:
         logger.error(f"Encountered error {err} while training.")
+        raise err
     else:
         # finish run.    
         run.finish()
