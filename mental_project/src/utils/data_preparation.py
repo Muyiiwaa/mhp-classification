@@ -8,7 +8,8 @@ from typing import Tuple, Optional, Dict
 import numpy as np
 import pandas as pd
 import torch
-from data_cleaning import data_cleaner, download_data
+from src.utils.data_cleaning import data_cleaner, download_data
+from src.config import *
 
 
 # configure logging
@@ -68,7 +69,7 @@ class MentalHealthData(Dataset):
 
 
 # setup dataloader function
-def final_dataloader(train_data: pd.DataFrame, test_data, MentalHealthData=MentalHealthData) -> Tuple[Optional[DataLoader],Optional[DataLoader]]:
+def final_dataloader(train_data: pd.DataFrame, test_data:pd.DataFrame) -> Tuple[Optional[DataLoader],Optional[DataLoader]]:
     """_This function takes the train and test dataframe, converts them to Pytorch's dataset
     and returns train and test dataloader for training and validation._
 
@@ -78,10 +79,10 @@ def final_dataloader(train_data: pd.DataFrame, test_data, MentalHealthData=Menta
         MentalHealthData (_type_, optional): _dataset class that defines the blueprint_. Defaults to MentalHealthData.
 
     Returns:
-        Tuple[Optional[DataLoader],Optional[DataLoader]]: _description_
+        Tuple[Optional[DataLoader],Optional[DataLoader]]: _TRAIN LOADER, TRAIN LOADER._
     """
     train_loader, test_loader = None, None
-    tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_URI)
     try:
         # create pytorch dataset instance for train and test.
         train_dataset = MentalHealthData(train_data, tokenizer=tokenizer)

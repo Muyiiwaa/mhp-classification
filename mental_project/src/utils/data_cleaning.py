@@ -4,6 +4,7 @@ import logging
 import pandas as pd
 import kagglehub
 import os
+from src.config import *
 
 # configure logging
 logging.basicConfig(level=logging.INFO, format= "%(levelname)s: %(message)s")
@@ -22,7 +23,7 @@ def download_data() -> Optional[pd.DataFrame]:
     data = None
     try:
         # download and prepare the data path
-        path = kagglehub.dataset_download("suchintikasarkar/sentiment-analysis-for-mental-health")
+        path = kagglehub.dataset_download(DATASET)
         data_path: List[str] = os.listdir(path)
         data_path: str = os.path.join(path, data_path[0])
 

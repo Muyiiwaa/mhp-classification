@@ -9,8 +9,9 @@ from typing import Optional, Tuple, Union, Dict, List, Literal
 import logging
 from torch.utils.data import DataLoader
 from sklearn.metrics import f1_score, precision_score, recall_score
-from data_preparation import *
-from data_cleaning import *
+from src.config import *
+from src.utils.data_preparation import *
+from src.utils.data_cleaning import *
 
 # configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -19,9 +20,10 @@ logger = logging.getLogger(__name__)
 # define model hyperparameters
 def get_params(model: PreTrainedModel) -> Tuple:
 
-    learning_rate = 2e-5
-    optimizer = optim.AdamW(params=model.parameters(), lr=learning_rate,weight_decay=0.1)
-    scheduler = optim.lr_scheduler.StepLR(optimizer = optimizer, step_size=2, gamma=0.1)
+    learning_rate = LEARNING_RATE
+    optimizer = optim.AdamW(params=model.parameters(), lr=LEARNING_RATE,weight_decay=OPTIMIZER["weight_decay"])
+    scheduler = optim.lr_scheduler.StepLR(optimizer = optimizer, 
+                                          step_size=SCHEDULER["step_size"], gamma=SCHEDULER["gamma"])
 
     return learning_rate, optimizer, scheduler
 
@@ -49,7 +51,7 @@ def load_model(model_uri: str) -> Tuple[Optional[PreTrainedModel], Optional[str]
     return model, device
 
 
-def train_model(epoch: int, model:PreTrainedModel, 
+def train_model(epoch: int, model, 
                 data:DataLoader, device: Literal['cpu','cuda']) -> Tuple[List[float], List[float], float]:
     """_This function performs the training/fine-tuning of the model on our mental health dataset.
     It only contains the logic for training. It performs this operation on only one epoch and
@@ -110,7 +112,7 @@ def train_model(epoch: int, model:PreTrainedModel,
 
 
 # setup the validation loop
-def validate_model(epoch: int, model:PreTrainedModel, 
+def validate_model(epoch: int, model, 
                 data:DataLoader, device: Literal['cpu','cuda']) -> Tuple[List[float], List[float], float]:
     """_This function evaluates the trained.
     It only contains the logic for evaluating the model on the test set. It performs this operation on only one epoch and
@@ -194,7 +196,7 @@ if __name__ == "__main__":
     train_df, test_df = split_dataset(data = data)
     train_loader, test_loader = final_dataloader(train_data=train_df,
                                                  test_data=test_df)
-    model, device = load_model(model_uri="distilbert-base-uncased")
+    model, device = load_model(model_uri=MODEL_URI)
     for epoch in range(5):
         train_labels, train_preds, train_loss = train_model(epoch=epoch, model=model,
                                                             data=train_loader,device=device)
